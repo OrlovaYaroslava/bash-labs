@@ -1,9 +1,13 @@
+# Завершаем выполнение при любой ошибке
+set -e
+
 # --- 1. Параметры подключения ---
-DB_NAME="lab2_db"       
-DB_USER="lab_user"      
-DB_HOST="localhost"     
-DB_PORT="5432"          
-DB_PASSWORD="lab_pass" 
+DB_NAME="lab2_db_test"       
+DB_USER="lab_user"          
+DB_HOST="localhost"          
+DB_PORT="5432"               
+DB_PASSWORD="lab_pass"       
+
 
 # --- 2. Директория с миграциями ---
 MIGRATIONS_DIR="./migrations"  # Папка с SQL-миграциями
