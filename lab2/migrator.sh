@@ -1,16 +1,15 @@
+#!/bin/bash
+
 # Завершаем выполнение при любой ошибке
 set -e
 
-# --- 1. Параметры подключения ---
-DB_NAME="lab2_db_test"       
-DB_USER="lab_user"          
-DB_HOST="localhost"          
-DB_PORT="5432"               
-DB_PASSWORD="lab_pass"       
-
+# --- 1. Загружаем переменные из файла .env ---
+set -a 
+source ../.env 
+set +a 
 
 # --- 2. Директория с миграциями ---
-MIGRATIONS_DIR="./migrations"  # Папка с SQL-миграциями
+MIGRATIONS_DIR="./migrations"  
 
 # Проверка существования директории с миграциями
 if [ ! -d "$MIGRATIONS_DIR" ]; then
@@ -18,7 +17,7 @@ if [ ! -d "$MIGRATIONS_DIR" ]; then
     exit 1
 fi
 
-# --- 3. Функции для выполнения SQL ---
+# --- 3. Функции для выполнения SQL --- 
 # Функция для выполнения SQL-запросов из файла
 run_sql() {
     local file=$1
