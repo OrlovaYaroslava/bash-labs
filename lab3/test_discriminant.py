@@ -1,5 +1,5 @@
 import unittest
-from discriminant import calculate_discriminant
+from lab3.discriminant import calculate_discriminant
 
 
 class TestDiscriminant(unittest.TestCase):
