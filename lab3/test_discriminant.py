@@ -8,7 +8,7 @@ class TestDiscriminant(unittest.TestCase):
     def test_positive_discriminant(self):
         """Положительный тест: D > 0."""
         result = calculate_discriminant(1, -5, 6)
-        self.assertEqual(result, 1.0)
+        self.assertEqual(result, 999.0)
 
     def test_zero_discriminant(self):
         """Положительный тест: D = 0."""
