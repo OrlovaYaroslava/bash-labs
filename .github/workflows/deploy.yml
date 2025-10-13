@@ -25,14 +25,14 @@ jobs:
           pip install flake8 coverage bandit
 
       - name: Run tests
-        run: python -m unittest test_discriminant.py -v
+        run: python -m unittest lab3.test_discriminant -
 
       - name: Run flake8 linter
-        run: flake8 discriminant.py test_discriminant.py
+        run: flake8 lab3/discriminant.py lab3/test_discriminant.py
 
       - name: Run coverage
         run: |
-          coverage run -m unittest test_discriminant.py
+          coverage run -m unittest lab3.test_discriminant
           coverage report -m
 
       - name: Run Bandit security check
