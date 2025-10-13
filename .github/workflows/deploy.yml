@@ -46,7 +46,7 @@ jobs:
         run: |
           curl -s -X POST https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage \
             -d chat_id=${TELEGRAM_CHAT_ID} \
-            -d text="✅ CI pipeline успешно завершён! Все тесты, линтинг, покрытие и безопасность в порядке."
+            -d text=" CI pipeline успешно завершён! Все тесты, линтинг, покрытие и безопасность в порядке."
 
       - name: Send failure notification to Telegram
         if: failure()
@@ -56,4 +56,4 @@ jobs:
         run: |
           curl -s -X POST https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage \
             -d chat_id=${TELEGRAM_CHAT_ID} \
-            -d text="❌ CI pipeline завершился с ошибкой! Проверьте тесты, линтинг, покрытие или безопасность."
+            -d text=" CI pipeline завершился с ошибкой! Проверьте тесты, линтинг, покрытие или безопасность."
