@@ -3,12 +3,12 @@
 # Завершаем выполнение при любой ошибке
 set -e
 
-# --- 1. Загружаем переменные из файла .env ---
+# 1. Загружаем переменные из файла .env
 set -a 
 source ../.env 
 set +a 
 
-# --- 2. Директория с миграциями ---
+# 2. Директория с миграциями
 MIGRATIONS_DIR="./migrations"  
 
 # Проверка существования директории с миграциями
@@ -17,7 +17,7 @@ if [ ! -d "$MIGRATIONS_DIR" ]; then
     exit 1
 fi
 
-# --- 3. Функции для выполнения SQL --- 
+# 3. Функции для выполнения SQL 
 # Функция для выполнения SQL-запросов из файла
 run_sql() {
     local file=$1
@@ -31,7 +31,7 @@ run_sql_c() {
     PGPASSWORD="$DB_PASSWORD" psql -U "$DB_USER" -d "$DB_NAME" -h "$DB_HOST" -p "$DB_PORT" -c "$query"
 }
 
-# --- 4. Создание таблицы migrations, если её нет ---
+# 4. Создание таблицы migrations, если её нет
 echo "Создаём таблицу 'migrations'."
 run_sql_c "CREATE TABLE IF NOT EXISTS migrations (
     id SERIAL PRIMARY KEY,
@@ -39,11 +39,11 @@ run_sql_c "CREATE TABLE IF NOT EXISTS migrations (
     applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );"
 
-# --- 5. Получение списка уже применённых миграций ---
+# 5. Получение списка уже применённых миграций
 echo "Получаем список применённых миграций..."
 applied_migrations=$(PGPASSWORD="$DB_PASSWORD" psql -U "$DB_USER" -d "$DB_NAME" -h "$DB_HOST" -p "$DB_PORT" -t -c "SELECT migration_name FROM migrations;")
 
-# --- 6. Применение новых миграций ---
+# 6. Применение новых миграций
 echo "Применяем новые миграции..."
 for file in "$MIGRATIONS_DIR"/*.sql; do
     # Проверяем, существует ли файл
