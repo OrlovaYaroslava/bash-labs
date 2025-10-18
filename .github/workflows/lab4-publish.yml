@@ -10,15 +10,8 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -28,19 +21,18 @@ jobs:
         id: get_tag
         run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-
       - name: Create versioned directory
         run: |
-          mkdir -p ./_site/v${{ steps.get_tag.outputs.TAG }}
-          cp -r lab4/. ./_site/v${{ steps.get_tag.outputs.TAG }}/
+          mkdir -p public/v${{ steps.get_tag.outputs.TAG }}
+          cp -r lab4/. public/v${{ steps.get_tag.outputs.TAG }}/
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./_site
+          path: ./public
 
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v4
