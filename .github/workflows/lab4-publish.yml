@@ -1,11 +1,10 @@
 # .github/workflows/lab4-publish.yml
-name: Publish Lab4 Website
+name: Publish Lab4 Website on Release
 
 on:
   release:
     types: [published]
 
-# Разрешения нужны для публикации на GitHub Pages
 permissions:
   contents: read
   pages: write
@@ -14,6 +13,10 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # Добавляем environment для GitHub Pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,18 +25,19 @@ jobs:
         id: get_tag
         run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
-      - name: Prepare site for deployment
+      - name: Create versioned directory
         run: |
-          mkdir -p ./_site/v${{ steps.get_tag.outputs.TAG }}
-          cp -r lab4/. ./_site/v${{ steps.get_tag.outputs.TAG }}/
+          mkdir -p public/v${{ steps.get_tag.outputs.TAG }}
+          cp -r lab4/. public/v${{ steps.get_tag.outputs.TAG }}/
 
-      - name: Setup GitHub Pages
+      - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload site
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./_site
+          path: ./public
 
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
