@@ -1,4 +1,3 @@
-# .github/workflows/lab4-publish.yml
 name: Publish Lab4 Website on Release
 
 on:
