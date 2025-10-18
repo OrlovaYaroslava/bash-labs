@@ -31,10 +31,17 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      # Создаем папку _site и копируем туда весь контент проекта
       - name: Build site with version
         run: |
-          mkdir -p ./_site/v${{ steps.get_tag.outputs.TAG }}
-          cp -r lab4/. ./_site/v${{ steps.get_tag.outputs.TAG }}/
+          mkdir -p ./_site
+          cp -r . ./_site/
+
+      # Переименовываем корневую папку в v{TAG} и перемещаем ее в корень _site
+      # Это обеспечит нужную структуру: /v{TAG}/... для каждой версии
+      - name: Move content to versioned folder
+        run: |
+          mv ./_site/lab4 ./_site/v${{ steps.get_tag.outputs.TAG }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
