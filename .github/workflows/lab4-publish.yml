@@ -1,3 +1,4 @@
+# .github/workflows/lab4-publish.yml
 name: Publish Lab4 Website on Release
 
 on:
@@ -12,10 +13,6 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # Добавляем environment для GitHub Pages
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
