@@ -1,53 +1,26 @@
-# .github/workflows/lab4-publish.yml
-name: Publish Lab4 Website on Release
+name: Deploy to GitHub Pages
 
 on:
+  push:
+    branches: [ main ]
   release:
     types: [published]
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Get release tag
-        id: get_tag
-        run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
       - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      # Создаем папку _site и копируем туда весь контент проекта
-      - name: Build site with version
-        run: |
-          mkdir -p ./_site
-          cp -r . ./_site/
-
-      # Переименовываем корневую папку в v{TAG} и перемещаем ее в корень _site
-      # Это обеспечит нужную структуру: /v{TAG}/... для каждой версии
-      - name: Move content to versioned folder
-        run: |
-          mv ./_site/lab4 ./_site/v${{ steps.get_tag.outputs.TAG }}
+        uses: actions/configure-pages@v3
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v2
         with:
-          path: ./_site
+          path: '.'
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v2
