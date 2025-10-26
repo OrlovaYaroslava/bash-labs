@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Publish Lab4 Website on Release
 
 on:
   release:
@@ -15,44 +15,23 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
-  
-      - name: Get release version
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
-      - name: Debug - Check files
-        run: |
-          echo "=== Current structure ==="
-          ls -la
-          echo "=== Lab4 contents ==="
-          ls -la lab4/
-          echo "=== HTML files ==="
-          find . -name "*.html" | head -10
-
-      - name: Prepare versioned deployment
-        run: |
-          mkdir -p ./_site
-          # Копируем содержимое lab4 в корень
-          cp -r ./lab4/* ./_site/
-          # Создаем версионную папку
-          mkdir -p ./_site/v${{ steps.get_version.outputs.VERSION }}
-          cp -r ./lab4/* ./_site/v${{ steps.get_version.outputs.VERSION }}/
-          
       - name: Setup Pages
         uses: actions/configure-pages@v4
-        
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './_site'
-          
+          path: './lab4'
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        
