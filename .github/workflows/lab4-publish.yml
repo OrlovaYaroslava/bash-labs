@@ -20,20 +20,38 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Checkout
+      - name: Checkout with tag info
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}  # Важно: используем конкретный тег
   
       - name: Get release version
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
+      - name: Debug - Show current files
+        run: |
+          echo "=== Files at this commit ==="
+          find . -name "*.html" | head -10
+          echo "=== Lab4 contents ==="
+          ls -la lab4/ || echo "No lab4 directory"
+
       - name: Prepare versioned deployment
         run: |
           mkdir -p ./_site
-          cp -r ./lab4/* ./_site/
-          mkdir -p ./_site/v${{ steps.get_version.outputs.VERSION }}
-          cp -r ./lab4/* ./_site/v${{ steps.get_version.outputs.VERSION }}/
+          # Копируем ВСЕ файлы репозитория (для основной версии)
+          cp -r ./* ./_site/ 2>/dev/null || true
+          cp -r ./.* ./_site/ 2>/dev/null || true
           
+          # Создаем версионную папку
+          mkdir -p ./_site/v${{ steps.get_version.outputs.VERSION }}
+          cp -r ./* ./_site/v${{ steps.get_version.outputs.VERSION }}/ 2>/dev/null || true
+          cp -r ./.* ./_site/v${{ steps.get_version.outputs.VERSION }}/ 2>/dev/null || true
+          
+          # Очищаем от служебных файлов
+          rm -rf ./_site/.git ./_site/.github
+          rm -rf ./_site/v${{ steps.get_version.outputs.VERSION }}/.git ./_site/v${{ steps.get_version.outputs.VERSION }}/.github
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
         
