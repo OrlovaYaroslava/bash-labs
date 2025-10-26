@@ -1,4 +1,4 @@
-name: Publish Lab4 Website on Release
+name: Deploy to GitHub Pages
 
 on:
   release:
@@ -9,28 +9,35 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
 jobs:
   deploy:
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
+  
+      - name: Get release version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
+      - name: Prepare versioned deployment
+        run: |
+          mkdir -p ./_site
+          cp -r ./lab4/* ./_site/
+          mkdir -p ./_site/v${{ steps.get_version.outputs.VERSION }}
+          cp -r ./lab4/* ./_site/v${{ steps.get_version.outputs.VERSION }}/
+          
       - name: Setup Pages
-        uses: actions/configure-pages@v4
-
+        uses: actions/configure-pages@v3
+        
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v2
         with:
-          path: './lab4'
-
+          path: './_site'
+          
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v2
