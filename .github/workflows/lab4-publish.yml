@@ -23,15 +23,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Get release version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Prepare deployment structure
+        run: |
+          # Создаем папку для деплоя
+          mkdir -p ./_deploy
+          
+          # Копируем lab4 в корень (основной сайт)
+          cp -r ./lab4/* ./_deploy/
+          
+          # Создаем папку с названием релиза v{номер}
+          mkdir -p ./_deploy/v${{ steps.get_version.outputs.VERSION }}
+          cp -r ./lab4/* ./_deploy/v${{ steps.get_version.outputs.VERSION }}/
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './lab4'
+          path: './_deploy'
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        
