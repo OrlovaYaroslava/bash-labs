@@ -3,6 +3,7 @@ name: Publish Lab4 Website on Release
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -14,39 +15,92 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository with tags
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # важно: нужны все теги
+
+      - name: Prepare build workspace
+        run: |
+          set -euxo pipefail
+          rm -rf site
+          mkdir -p site
+
+      - name: Collect all release tags (v*)
+        id: tags
+        shell: bash
+        run: |
+          TAGS=$(git tag -l 'v*' --sort=-v:refname)
+          echo "tags<<EOF" >> $GITHUB_OUTPUT
+          echo "$TAGS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Build each version into /vX.Y.Z/
+        shell: bash
+        run: |
+          set -euo pipefail
+          CURRENT_REF=$(git rev-parse --abbrev-ref HEAD || true)
+          if [ "$CURRENT_REF" = "HEAD" ]; then CURRENT_REF=$(git describe --always --tags); fi
+
+          for t in ${{ steps.tags.outputs.tags }}; do
+            echo ">>> Building version $t"
+            git checkout --quiet "$t"
+
+            ver="${t#v}"
+            out="site/v${ver}"
+            mkdir -p "$out"
+
+            if [ -d lab4 ]; then
+              echo "• Found lab4/, copying it…"
+              cp -R lab4 "$out"/
+              # индекс версии: мягкий редирект на lab4/
+              cat > "$out/index.html" <<HTML
+<!doctype html>
+<html lang="ru"><meta charset="utf-8">
+<meta http-equiv="refresh" content="0; url=./lab4/">
+<title>v${ver}</title>
+<p>Перенаправление на <a href="./lab4/">страницу ЛР4</a>…</p>
+</html>
+HTML
+            else
+              echo "• No lab4/ — using RU/EN at repo root (if present)…"
+              [ -d ru ] && cp -R ru "$out"/ || true
+              [ -d en ] && cp -R en "$out"/ || true
+
+              # индекс версии с выбором RU/EN
+              cat > "$out/index.html" <<HTML
+<!doctype html>
+<html lang="ru"><meta charset="utf-8">
+<title>Версия v${ver}</title>
+<h1>Версия v${ver}</h1>
+<ul>
+  <li><a href="./ru/">Русская версия</a></li>
+  <li><a href="./en/">English version</a></li>
+</ul>
+<p><a href="../">← Ко всем версиям</a></p>
+</html>
+HTML
+            fi
+          done
+
+          git checkout --quiet "$CURRENT_REF"
+
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
   deploy:
+    needs: build
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Get release version
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
-      - name: Prepare deployment structure
-        run: |
-          # Создаем папку для деплоя
-          mkdir -p ./_deploy
-          
-          # Копируем lab4 в корень (основной сайт)
-          cp -r ./lab4/* ./_deploy/
-          
-          # Создаем папку с названием релиза v{номер}
-          mkdir -p ./_deploy/v${{ steps.get_version.outputs.VERSION }}
-          cp -r ./lab4/* ./_deploy/v${{ steps.get_version.outputs.VERSION }}/
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './_deploy'
-
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
