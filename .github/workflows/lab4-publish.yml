@@ -21,7 +21,7 @@ jobs:
       - name: Checkout repository with tags
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # важно: нужны все теги
+          fetch-depth: 0
 
       - name: Prepare build workspace
         run: |
@@ -56,7 +56,7 @@ jobs:
             if [ -d lab4 ]; then
               echo "• Found lab4/, copying it…"
               cp -R lab4 "$out"/
-              # индекс версии: мягкий редирект на lab4/
+              # индекс версии: редирект на lab4/
               cat > "$out/index.html" <<HTML
 <!doctype html>
 <html lang="ru"><meta charset="utf-8">
@@ -88,6 +88,26 @@ HTML
 
           git checkout --quiet "$CURRENT_REF"
 
+      - name: Generate root index with versions list
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > site/index.html <<'HTML'
+<!doctype html>
+<html lang="ru"><meta charset="utf-8">
+<title>Bash-Labs — версии</title>
+<h1>Доступные версии</h1>
+<p>Кликните по версии, затем выберите RU/EN.</p>
+<ul>
+HTML
+          for t in ${{ steps.tags.outputs.tags }}; do
+            ver="${t#v}"
+            echo "  <li><a href=\"./v${ver}/\">v${ver}</a></li>" >> site/index.html
+          done
+          cat >> site/index.html <<'HTML'
+</ul>
+</html>
+HTML
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
