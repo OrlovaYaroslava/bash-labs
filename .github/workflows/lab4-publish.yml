@@ -42,6 +42,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          IFS=$'\n'   # читаем теги построчно
           CURRENT_REF=$(git rev-parse --abbrev-ref HEAD || true)
           if [ "$CURRENT_REF" = "HEAD" ]; then CURRENT_REF=$(git describe --always --tags); fi
 
