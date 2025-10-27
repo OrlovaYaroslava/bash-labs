@@ -57,32 +57,32 @@ jobs:
               echo "• Found lab4/, copying it…"
               cp -R lab4 "$out"/
               # индекс версии: редирект на lab4/
-              cat > "$out/index.html" <<HTML
-<!doctype html>
-<html lang="ru"><meta charset="utf-8">
-<meta http-equiv="refresh" content="0; url=./lab4/">
-<title>v${ver}</title>
-<p>Перенаправление на <a href="./lab4/">страницу ЛР4</a>…</p>
-</html>
-HTML
+              printf '%s\n' \
+                '<!doctype html>' \
+                '<html lang="ru"><meta charset="utf-8">' \
+                '<meta http-equiv="refresh" content="0; url=./lab4/">' \
+                "<title>v${ver}</title>" \
+                '<p>Перенаправление на <a href="./lab4/">страницу ЛР4</a>…</p>' \
+                '</html>' \
+              > "$out/index.html"
             else
               echo "• No lab4/ — using RU/EN at repo root (if present)…"
               [ -d ru ] && cp -R ru "$out"/ || true
               [ -d en ] && cp -R en "$out"/ || true
 
               # индекс версии с выбором RU/EN
-              cat > "$out/index.html" <<HTML
-<!doctype html>
-<html lang="ru"><meta charset="utf-8">
-<title>Версия v${ver}</title>
-<h1>Версия v${ver}</h1>
-<ul>
-  <li><a href="./ru/">Русская версия</a></li>
-  <li><a href="./en/">English version</a></li>
-</ul>
-<p><a href="../">← Ко всем версиям</a></p>
-</html>
-HTML
+              printf '%s\n' \
+                '<!doctype html>' \
+                '<html lang="ru"><meta charset="utf-8">' \
+                "<title>Версия v${ver}</title>" \
+                "<h1>Версия v${ver}</h1>" \
+                '<ul>' \
+                '  <li><a href="./ru/">Русская версия</a></li>' \
+                '  <li><a href="./en/">English version</a></li>' \
+                '</ul>' \
+                '<p><a href="../">← Ко всем версиям</a></p>' \
+                '</html>' \
+              > "$out/index.html"
             fi
           done
 
@@ -92,22 +92,20 @@ HTML
         shell: bash
         run: |
           set -euo pipefail
-          cat > site/index.html <<'HTML'
-<!doctype html>
-<html lang="ru"><meta charset="utf-8">
-<title>Bash-Labs — версии</title>
-<h1>Доступные версии</h1>
-<p>Кликните по версии, затем выберите RU/EN.</p>
-<ul>
-HTML
-          for t in ${{ steps.tags.outputs.tags }}; do
-            ver="${t#v}"
-            echo "  <li><a href=\"./v${ver}/\">v${ver}</a></li>" >> site/index.html
-          done
-          cat >> site/index.html <<'HTML'
-</ul>
-</html>
-HTML
+          {
+            echo '<!doctype html>'
+            echo '<html lang="ru"><meta charset="utf-8">'
+            echo '<title>Bash-Labs — версии</title>'
+            echo '<h1>Доступные версии</h1>'
+            echo '<p>Кликните по версии, затем выберите RU/EN.</p>'
+            echo '<ul>'
+            for t in ${{ steps.tags.outputs.tags }}; do
+              ver="${t#v}"
+              echo "  <li><a href=\"./v${ver}/\">v${ver}</a></li>"
+            done
+            echo '</ul>'
+            echo '</html>'
+          } > site/index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
