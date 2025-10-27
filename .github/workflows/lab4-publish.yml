@@ -42,11 +42,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          IFS=$'\n'   # читаем теги построчно
           CURRENT_REF=$(git rev-parse --abbrev-ref HEAD || true)
           if [ "$CURRENT_REF" = "HEAD" ]; then CURRENT_REF=$(git describe --always --tags); fi
 
-          for t in ${{ steps.tags.outputs.tags }}; do
+          TAGS="${{ steps.tags.outputs.tags }}"
+          # Идём по тегам построчно
+          while IFS= read -r t; do
+            [ -z "$t" ] && continue
             echo ">>> Building version $t"
             git checkout --quiet "$t"
 
@@ -85,7 +87,7 @@ jobs:
                 '</html>' \
               > "$out/index.html"
             fi
-          done
+          done <<< "$TAGS"
 
           git checkout --quiet "$CURRENT_REF"
 
@@ -93,6 +95,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          TAGS="${{ steps.tags.outputs.tags }}"
           {
             echo '<!doctype html>'
             echo '<html lang="ru"><meta charset="utf-8">'
@@ -100,10 +103,11 @@ jobs:
             echo '<h1>Доступные версии</h1>'
             echo '<p>Кликните по версии, затем выберите RU/EN.</p>'
             echo '<ul>'
-            for t in ${{ steps.tags.outputs.tags }}; do
+            while IFS= read -r t; do
+              [ -z "$t" ] && continue
               ver="${t#v}"
               echo "  <li><a href=\"./v${ver}/\">v${ver}</a></li>"
-            done
+            done <<< "$TAGS"
             echo '</ul>'
             echo '</html>'
           } > site/index.html
