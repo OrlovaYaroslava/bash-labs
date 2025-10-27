@@ -1,3 +1,43 @@
+name: Publish Lab4 Website on Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository with tags
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare build workspace
+        run: |
+          set -euxo pipefail
+          rm -rf site
+          mkdir -p site
+
+      - name: Collect all release tags (v*)
+        id: tags
+        shell: bash
+        run: |
+          TAGS=$(git tag -l 'v*' --sort=-v:refname)
+          echo "tags<<EOF" >> $GITHUB_OUTPUT
+          echo "$TAGS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Build each version into /vX.Y.Z/
         shell: bash
         run: |
@@ -47,3 +87,40 @@ HTML
           done
 
           git checkout --quiet "$CURRENT_REF"
+
+      - name: Generate root index with versions list
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > site/index.html <<'HTML'
+<!doctype html>
+<html lang="ru"><meta charset="utf-8">
+<title>Bash-Labs — версии</title>
+<h1>Доступные версии</h1>
+<p>Кликните по версии, затем выберите RU/EN.</p>
+<ul>
+HTML
+          for t in ${{ steps.tags.outputs.tags }}; do
+            ver="${t#v}"
+            echo "  <li><a href=\"./v${ver}/\">v${ver}</a></li>" >> site/index.html
+          done
+          cat >> site/index.html <<'HTML'
+</ul>
+</html>
+HTML
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
