@@ -1,1 +1,8 @@
 .env
+# Flask database
+lab5/database.db
+
+# SQLite journal files (служебные)
+*.db-journal
+*.sqlite
+*.sqlite3
