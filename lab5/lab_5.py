@@ -126,8 +126,7 @@ def _login_form(error: str = "", email: str = "") -> str:
         </form>
         <p>Нет аккаунта?
             <a href="{url_for('signup')}">Зарегистрироваться</a>
-        </p>
-        <p>Тест: admin@example.com / 1234</p>
+
     """
 
 
