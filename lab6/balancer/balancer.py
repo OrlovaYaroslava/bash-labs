@@ -25,8 +25,8 @@ current_index = 0
 def health_check():
     """
     Фоновая проверка состояния всех инстансов каждые 5 секунд.
-    НИКАКИЕ инстансы из списка не удаляются,
-    меняется только их статус в словаре instance_status.
+    
+    
     """
     while True:
         for inst in list(instances):
@@ -34,7 +34,7 @@ def health_check():
                 resp = requests.get(f"{inst}/health", timeout=1)
                 instance_status[inst] = (resp.status_code == 200)
             except Exception:
-                instance_status[inst] = False
+                instance_status[inst] = False   
 
         time.sleep(5)
 

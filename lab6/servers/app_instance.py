@@ -4,7 +4,7 @@ import sys
 app = Flask(__name__)
 
 # 1. Получение номера порта при запуске
-#    Пример запуска: python app_instance.py 5001
+
 if len(sys.argv) != 2:
     print("Ошибка: необходимо указать порт, например:")
     print("python app_instance.py 5001")
