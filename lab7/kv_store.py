@@ -24,8 +24,11 @@ else:
 
 def save_data():
     """Сохранение словаря data в файл data.json."""
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
+    try:
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+    except Exception as e:
+        print(f"Ошибка при сохранении данных: {e}")
 
 # ------------------------------------------------------
 # 3. Настройка Flask-Limiter
