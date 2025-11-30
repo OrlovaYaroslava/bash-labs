@@ -1,0 +1,52 @@
+[
+  {
+    "timestamp": "2025-11-30T17:52:39",
+    "category": "одежда",
+    "amount": 1875.65
+  },
+  {
+    "timestamp": "2025-11-30T17:52:39",
+    "category": "еда",
+    "amount": 1644.11
+  },
+  {
+    "timestamp": "2025-11-30T17:52:39",
+    "category": "транспорт",
+    "amount": 1272.94
+  },
+  {
+    "timestamp": "2025-11-30T17:52:39",
+    "category": "еда",
+    "amount": 505.36
+  },
+  {
+    "timestamp": "2025-11-30T17:52:39",
+    "category": "одежда",
+    "amount": 2594.03
+  },
+  {
+    "timestamp": "2025-11-30T17:52:39",
+    "category": "одежда",
+    "amount": 4240.09
+  },
+  {
+    "timestamp": "2025-11-30T17:52:39",
+    "category": "развлечения",
+    "amount": 1138.24
+  },
+  {
+    "timestamp": "2025-11-30T17:52:39",
+    "category": "одежда",
+    "amount": 334.83
+  },
+  {
+    "timestamp": "2025-11-30T17:52:39",
+    "category": "одежда",
+    "amount": 413.6
+  },
+  {
+    "timestamp": "2025-11-30T17:52:39",
+    "category": "еда",
+    "amount": 543.19
+  }
+]
