@@ -19,21 +19,23 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Install all dependencies
         run: |
           python -m pip install --upgrade pip
-          # Установите зависимости из папки RGZ
-          if [ -f "RGZ/requirements.txt" ]; then
-            pip install -r RGZ/requirements.txt
-          else
-            pip install Flask==2.3.3 pytest==7.4.2 bandit==1.7.5
-          fi
+          # Устанавливаем ВСЕ необходимые зависимости явно
+          pip install Flask==2.3.3
+          pip install pytest==7.4.2
+          pip install bandit==1.7.5
+          # pbr требуется для работы bandit
+          pip install pbr==5.11.1
+          # stevedore тоже может потребоваться
+          pip install stevedore==5.1.0
 
       - name: Run unit tests
         run: |
           echo "Running unit tests from RGZ folder..."
           cd RGZ
-          python -m pytest test_app.py -v --tb=short
+          python -m pytest test_app.py -v
 
       - name: Security check with Bandit
         run: |
