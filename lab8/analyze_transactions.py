@@ -31,7 +31,7 @@ async def analyze_transactions():
     # Словарь для агрегации
     category_totals = {}
 
-    # Читаем все файлы асинхронно (последовательно с await, но в асинхронном контексте)
+    # Читаем все файлы асинхронно 
     for filepath in sorted(filepaths):
         transactions = await read_transaction_file(filepath)
         for tx in transactions:
