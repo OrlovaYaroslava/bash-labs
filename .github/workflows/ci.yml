@@ -52,12 +52,12 @@ jobs:
           
           # В учебном проекте разрешаем bandit warnings
           if [ $BANDIT_EXIT_CODE -eq 0 ]; then
-            echo "✅ Bandit passed with no issues"
+            echo " Bandit passed with no issues"
           elif [ $BANDIT_EXIT_CODE -eq 1 ]; then
-            echo "⚠️ Bandit found issues (expected for Flask dev server and pytest)"
+            echo " Bandit found issues (expected for Flask dev server and pytest)"
             echo "This is acceptable for the educational assignment"
           else
-            echo "❌ Bandit failed with unexpected error"
+            echo " Bandit failed with unexpected error"
             exit 1
           fi
 
@@ -72,9 +72,9 @@ jobs:
           
           echo "Testing /health endpoint..."
           if curl -f http://localhost:5001/health; then
-            echo "✅ Health check passed"
+            echo " Health check passed"
           else
-            echo "❌ Health check failed"
+            echo " Health check failed"
             exit 1
           fi
           
@@ -82,25 +82,10 @@ jobs:
           if curl -f -X POST http://localhost:5001/analyze \
             -H "Content-Type: application/json" \
             -d '{"text": "Test for GitHub Actions"}'; then
-            echo "✅ Analyze endpoint passed"
+            echo " Analyze endpoint passed"
           else
-            echo "❌ Analyze endpoint failed"
+            echo " Analyze endpoint failed"
             exit 1
           fi
           
           kill $FLASK_PID 2>/dev/null || true
-
-      - name: Generate final report
-        if: always()
-        run: |
-          echo "## 📊 Assignment Completion Report" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### ✅ All Requirements Met:" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "1. **RESTful API on Flask** - Implemented with POST /analyze endpoint" >> $GITHUB_STEP_SUMMARY
-          echo "2. **Unit tests** - Created and executed successfully" >> $GITHUB_STEP_SUMMARY
-          echo "3. **Nginx load balancing** - Configured and tested locally" >> $GITHUB_STEP_SUMMARY
-          echo "4. **GitHub Actions workflow** - Configured and running" >> $GITHUB_STEP_SUMMARY
-          echo "5. **Bandit security check** - Executed (warnings are expected in dev environment)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**🎯 Assignment Status: COMPLETED SUCCESSFULLY**" >> $GITHUB_STEP_SUMMARY
