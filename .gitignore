@@ -6,3 +6,4 @@ lab5/database.db
 *.db-journal
 *.sqlite
 *.sqlite3
+.pytest_cache
