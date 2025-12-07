@@ -18,13 +18,13 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-          cache: "pip"
+          # Убрали cache, так как нет requirements.txt
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest bandit
+          # Устанавливаем зависимости напрямую
+          pip install Flask==2.3.3 pytest==7.4.2 bandit==1.7.5
 
       - name: Run unit tests
         run: |
@@ -34,14 +34,7 @@ jobs:
       - name: Security check with Bandit
         run: |
           echo "Running security check..."
-          bandit -r . -f html -o bandit_report.html || true
-
-      - name: Upload Bandit report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: bandit-security-report
-          path: bandit_report.html
+          bandit -r . -f txt
 
       - name: Test Flask application
         run: |
